@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${title}">Insurance Report Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #74ebd5, #ACB6E5); /* Blueish gradient */
+            min-height: 100vh;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .card {
+            border-radius: 16px;
+        }
+        .btn-primary, .btn-outline-primary, .btn-outline-danger {
+            border-radius: 25px;
+        }
+        .table th {
+            background-color: #343a40 !important;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container py-5">
+    <div class="text-center text-white mb-4">
+        <h2 th:text="${title}" class="fw-bold"></h2>
+        <p>Search and download insurance reports easily.</p>
+    </div>
+
+    <!-- Search Form -->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <form method="post" th:action="@{/search}" th:object="${search}">
+                <div class="row g-3 mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Plan Name</label>
+                        <select th:field="*{planName}" class="form-select">
+                            <option value="">Select...</option>
+                            <option th:each="name : ${planNames}" th:value="${name}" th:text="${name}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Plan Status</label>
+                        <select th:field="*{planStatus}" class="form-select">
+                            <option value="">Select...</option>
+                            <option th:each="status : ${planStatuses}" th:value="${status}" th:text="${status}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Gender</label>
+                        <select th:field="*{gender}" class="form-select">
+                            <option value="">Select...</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Start Date</label>
+                        <input type="date" th:field="*{startDate}" class="form-control">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">End Date</label>
+                        <input type="date" th:field="*{endDate}" class="form-control">
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary px-5">🔍 Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Results Table -->
+    <div th:if="${plans != null}">
+        <div th:if="${!plans.isEmpty()}" class="card shadow mb-4">
+            <div class="card-body">
+                <h5 class="mb-3">Search Results</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover text-center">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Gender</th>
+                                <th>Plan</th>
+                                <th>Status</th>
+                                <th>Benefit</th>
+                                <th>Start</th>
+                                <th>End</th>
+                                <th>Denied</th>
+                                <th>Terminated</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="plan : ${plans}">
+                                <td th:text="${plan.id}"></td>
+                                <td th:text="${plan.name}"></td>
+                                <td th:text="${plan.gender}"></td>
+                                <td th:text="${plan.planname}"></td>
+                                <td th:text="${plan.planstatus}"></td>
+                                <td th:text="${plan.benift}"></td>
+                                <td th:text="${plan.startdate}"></td>
+                                <td th:text="${plan.enddate}"></td>
+                                <td th:text="${plan.deniedreason}"></td>
+                                <td th:text="${plan.terminatedreason}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div th:if="${plans.isEmpty()}" class="alert alert-warning text-center">No records found.</div>
+    </div>
+
+    <!-- Download Section -->
+    <div class="card shadow">
+        <div class="card-body">
+            <form method="post" th:action="@{/download}" th:object="${search}">
+                <input type="hidden" th:field="*{planName}" />
+                <input type="hidden" th:field="*{planStatus}" />
+                <input type="hidden" th:field="*{gender}" />
+                <input type="hidden" th:field="*{startDate}" />
+                <input type="hidden" th:field="*{endDate}" />
+
+                <div class="mb-3">
+                    <label class="form-label">Send file to email (optional)</label>
+                    <input type="email" name="email" class="form-control" placeholder="example@mail.com" />
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" name="type" value="excel" class="btn btn-outline-primary me-3">
+                        ⬇️ Download Excel
+                    </button>
+                    <button type="submit" name="type" value="pdf" class="btn btn-outline-danger">
+                        ⬇️ Download PDF
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
